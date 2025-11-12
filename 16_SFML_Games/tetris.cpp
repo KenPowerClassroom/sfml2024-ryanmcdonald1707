@@ -2,13 +2,13 @@
 #include <time.h>
 using namespace sf;
 
-const int M = 20;
-const int N = 10;
+const int GRIDHEIGHT = 20;
+const int GRIDWIDTH = 10;
 
-int field[M][N] = {0};
+int field[GRIDHEIGHT][GRIDWIDTH] = {0};
 
 struct Point
-{int x,y;} a[4], b[4];
+{int x,y;} tetronimoPos[60], backupPos[4];
 
 int figures[7][4] =
 {
@@ -24,8 +24,8 @@ int figures[7][4] =
 bool check()
 {
    for (int i=0;i<4;i++)
-      if (a[i].x<0 || a[i].x>=N || a[i].y>=M) return 0;
-      else if (field[a[i].y][a[i].x]) return 0;
+      if (tetronimoPos[i].x<0 || tetronimoPos[i].x>= GRIDWIDTH || tetronimoPos[i].y>= GRIDHEIGHT) return 0;
+      else if (field[tetronimoPos[i].y][tetronimoPos[i].x]) return 0;
 
    return 1;
 };
@@ -37,12 +37,12 @@ int tetris()
 
     RenderWindow window(VideoMode(320, 480), "The Game!");
 
-    Texture t1,t2,t3;
-    t1.loadFromFile("images/tetris/tiles.png");
-    t2.loadFromFile("images/tetris/background.png");
-    t3.loadFromFile("images/tetris/frame.png");
+    Texture tilesTexture, backgroundTexture, frameTexture;
+    tilesTexture.loadFromFile("images/tetris/tiles.png");
+    backgroundTexture.loadFromFile("images/tetris/background.png");
+    frameTexture.loadFromFile("images/tetris/frame.png");
 
-    Sprite s(t1), background(t2), frame(t3);
+    Sprite tiles(tilesTexture), background(backgroundTexture), frame(frameTexture);
 
     int dx=0; bool rotate=0; int colorNum=1;
     float timer=0,delay=0.3; 
@@ -70,38 +70,38 @@ int tetris()
     if (Keyboard::isKeyPressed(Keyboard::Down)) delay=0.05;
 
     //// <- Move -> ///
-    for (int i=0;i<4;i++)  { b[i]=a[i]; a[i].x+=dx; }
-    if (!check()) for (int i=0;i<4;i++) a[i]=b[i];
+    for (int i=0;i<4;i++)  { backupPos[i]=tetronimoPos[i]; tetronimoPos[i].x+=dx; }
+    if (!check()) for (int i=0;i<4;i++) tetronimoPos[i]=backupPos[i];
 
     //////Rotate//////
     if (rotate)
       {
-        Point p = a[1]; //center of rotation
+        Point p = tetronimoPos[1]; //center of rotation
         for (int i=0;i<4;i++)
           {
-            int x = a[i].y-p.y;
-            int y = a[i].x-p.x;
-            a[i].x = p.x - x;
-            a[i].y = p.y + y;
+            int x = tetronimoPos[i].y-p.y;
+            int y = tetronimoPos[i].x-p.x;
+            tetronimoPos[i].x = p.x - x;
+            tetronimoPos[i].y = p.y + y;
            }
-           if (!check()) for (int i=0;i<4;i++) a[i]=b[i];
+           if (!check()) for (int i=0;i<4;i++) tetronimoPos[i]=backupPos[i];
       }
 
     ///////Tick//////
     if (timer>delay)
       {
-        for (int i=0;i<4;i++) { b[i]=a[i]; a[i].y+=1; }
+        for (int i=0;i<4;i++) { backupPos[i]=tetronimoPos[i]; tetronimoPos[i].y+=1; }
 
         if (!check())
         {
-         for (int i=0;i<4;i++) field[b[i].y][b[i].x]=colorNum;
+         for (int i=0;i<4;i++) field[backupPos[i].y][backupPos[i].x]=colorNum;
 
          colorNum=1+rand()%7;
          int n=rand()%7;
          for (int i=0;i<4;i++)
            {
-            a[i].x = figures[n][i] % 2;
-            a[i].y = figures[n][i] / 2;
+            tetronimoPos[i].x = figures[n][i] % 2;
+            tetronimoPos[i].y = figures[n][i] / 2;
            }
         }
 
@@ -109,16 +109,16 @@ int tetris()
       }
 
     ///////check lines//////////
-    int k=M-1;
-    for (int i=M-1;i>0;i--)
+    int k = GRIDHEIGHT -1;
+    for (int i = GRIDHEIGHT -1;i>0;i--)
     {
         int count=0;
-        for (int j=0;j<N;j++)
+        for (int j=0;j< GRIDWIDTH;j++)
         {
             if (field[i][j]) count++;
             field[k][j]=field[i][j];
         }
-        if (count<N) k--;
+        if (count< GRIDWIDTH) k--;
     }
 
     dx=0; rotate=0; delay=0.3;
@@ -127,22 +127,22 @@ int tetris()
     window.clear(Color::White);    
     window.draw(background);
           
-    for (int i=0;i<M;i++)
-     for (int j=0;j<N;j++)
+    for (int i=0;i< GRIDHEIGHT ;i++)
+     for (int j=0;j< GRIDWIDTH;j++)
        {
          if (field[i][j]==0) continue;
-         s.setTextureRect(IntRect(field[i][j]*18,0,18,18));
-         s.setPosition(j*18,i*18);
-         s.move(28,31); //offset
-         window.draw(s);
+         tiles.setTextureRect(IntRect(field[i][j]*18,0,18,18));
+         tiles.setPosition(j*18,i*18);
+         tiles.move(28,31); //offset
+         window.draw(tiles);
        }
 
     for (int i=0;i<4;i++)
       {
-        s.setTextureRect(IntRect(colorNum*18,0,18,18));
-        s.setPosition(a[i].x*18,a[i].y*18);
-        s.move(28,31); //offset
-        window.draw(s);
+        tiles.setTextureRect(IntRect(colorNum*18,0,18,18));
+        tiles.setPosition(tetronimoPos[i].x*18,tetronimoPos[i].y*18);
+        tiles.move(28,31); //offset
+        window.draw(tiles);
       }
 
     window.draw(frame);
