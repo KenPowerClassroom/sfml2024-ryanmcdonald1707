@@ -10,7 +10,9 @@ int field[GRIDHEIGHT][GRIDWIDTH] = {0};
 struct Point
 {int x,y;} tetronimoPos[60], backupPos[4];
 
-int figures[7][4] =
+
+
+int tetronimoShapes[7][4] =
 {
     1,3,5,7, // I
     2,4,5,7, // Z
@@ -124,15 +126,20 @@ int tetris()
 
             if (!check())
             {
-             for (int i=0;i<4;i++) field[backupPos[i].y][backupPos[i].x]=colorNum;
+                int oldColor = colorNum;
 
-             colorNum=1+rand()%7;
-             int n=rand()%7;
-             for (int i=0;i<4;i++)
-               {
-                tetronimoPos[i].x = figures[n][i] % 2;
-                tetronimoPos[i].y = figures[n][i] / 2;
-               }
+                int n = rand() % 7;
+
+
+                colorNum = 1 + rand() % 7;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    field[backupPos[i].y][backupPos[i].x] = oldColor;
+
+                    tetronimoPos[i].x = tetronimoShapes[n][i] % 2;
+                    tetronimoPos[i].y = tetronimoShapes[n][i] / 2;
+                }
             }
 
              timer=0;
