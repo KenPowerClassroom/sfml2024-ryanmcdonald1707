@@ -4,6 +4,7 @@ using namespace sf;
 
 const int GRIDHEIGHT = 20;
 const int GRIDWIDTH = 10;
+const int TILESIZE = 18;
 
 int field[GRIDHEIGHT][GRIDWIDTH] = {0};
 
@@ -131,16 +132,16 @@ int tetris()
      for (int j=0;j< GRIDWIDTH;j++)
        {
          if (field[i][j]==0) continue;
-         tiles.setTextureRect(IntRect(field[i][j]*18,0,18,18));
-         tiles.setPosition(j*18,i*18);
+         tiles.setTextureRect(IntRect(field[i][j]*TILESIZE,0, TILESIZE, TILESIZE));
+         tiles.setPosition(j* TILESIZE,i* TILESIZE);
          tiles.move(28,31); //offset
          window.draw(tiles);
        }
 
     for (int i=0;i<4;i++)
       {
-        tiles.setTextureRect(IntRect(colorNum*18,0,18,18));
-        tiles.setPosition(tetronimoPos[i].x*18,tetronimoPos[i].y*18);
+        tiles.setTextureRect(IntRect(colorNum * TILESIZE,0, TILESIZE, TILESIZE));
+        tiles.setPosition(tetronimoPos[i].x * TILESIZE,tetronimoPos[i].y * TILESIZE);
         tiles.move(28,31); //offset
         window.draw(tiles);
       }
