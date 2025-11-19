@@ -10,7 +10,14 @@ int field[GRIDHEIGHT][GRIDWIDTH] = {0};
 struct Point
 {int x,y;} tetronimoPos[60], backupPos[4];
 
+class Tetronimo
+{
+public:
+    bool check();
+    void rotateTetronimo(bool* t_rotate);
+private:
 
+};
 
 int tetronimoShapes[7][4] =
 {
@@ -23,7 +30,7 @@ int tetronimoShapes[7][4] =
     2,3,4,5, // O
 };
 
-bool check()
+bool Tetronimo::check()
 {
     for (int i = 0; i < 4; i++)
     {
@@ -52,22 +59,7 @@ void input(Window* t_window, bool* t_rotate, int* t_dx, float* t_delay)
     }
 }
 
-void rotateTetronimo(bool* t_rotate)
-{
-    //////Rotate//////
-    if (*t_rotate)
-    {
-        Point p = tetronimoPos[1]; //center of rotation
-        for (int i = 0; i < 4; i++)
-        {
-            int x = tetronimoPos[i].y - p.y;
-            int y = tetronimoPos[i].x - p.x;
-            tetronimoPos[i].x = p.x - x;
-            tetronimoPos[i].y = p.y + y;
-        }
-        if (!check()) for (int i = 0; i < 4; i++) tetronimoPos[i] = backupPos[i];
-    }
-}
+
 
 void checkLines()
 {
@@ -98,6 +90,8 @@ int tetris()
 
     Sprite tiles(tilesTexture), background(backgroundTexture), frame(frameTexture);
 
+    Tetronimo tetronimoPiece;
+
     int dx=0; bool rotate=0; int colorNum=1;
     float timer=0,delay=0.3; 
 
@@ -115,16 +109,16 @@ int tetris()
 
         //// <- Move -> ///
         for (int i=0;i<4;i++)  { backupPos[i]=tetronimoPos[i]; tetronimoPos[i].x+=dx; }
-        if (!check()) for (int i=0;i<4;i++) tetronimoPos[i]=backupPos[i];
+        if (!tetronimoPiece.check()) for (int i=0;i<4;i++) tetronimoPos[i]=backupPos[i];
 
-        rotateTetronimo(& rotate);
+        tetronimoPiece.rotateTetronimo(& rotate);
 
         ///////Tick//////
         if (timer>delay)
           {
             for (int i=0;i<4;i++) { backupPos[i]=tetronimoPos[i]; tetronimoPos[i].y+=1; }
 
-            if (!check())
+            if (!tetronimoPiece.check())
             {
                 int oldColor = colorNum;
 
@@ -176,4 +170,21 @@ int tetris()
     }
 
     return 0;
+}
+
+void Tetronimo::rotateTetronimo(bool* t_rotate)
+{
+    //////Rotate//////
+    if (*t_rotate)
+    {
+        Point p = tetronimoPos[1]; //center of rotation
+        for (int i = 0; i < 4; i++)
+        {
+            int x = tetronimoPos[i].y - p.y;
+            int y = tetronimoPos[i].x - p.x;
+            tetronimoPos[i].x = p.x - x;
+            tetronimoPos[i].y = p.y + y;
+        }
+        if (!check()) for (int i = 0; i < 4; i++) tetronimoPos[i] = backupPos[i];
+    }
 }
